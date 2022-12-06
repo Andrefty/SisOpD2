@@ -1,0 +1,9 @@
+dirpath= alocat dinamic sau asigurat ca / nu este dat in path-ul original'
+nu are sens tratarea erorilor si sa continue while-ul, mai bine break
+
+in loc de manevrat cu concatenari de path-uri, mai bine sa dau cd in folder de mai jos si apoi inapoi la terminarea recursivitatii
+
+
+
+trebuie adunat si dimensiunile folderelor, ca sa dea ca du -b
+

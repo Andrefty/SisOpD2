@@ -20,12 +20,14 @@ int calcul(int argc, char *argv[])
 
     if (argc != 2)
     {
-        printf("Usage: %s <directory_path>", argv[0]);
+        printf("Usage: %s <cale_director>", argv[0]);
         exit(1);
     }
 
     dirpath = argv[1];
-
+    // remove the last slash if it exists
+    if (dirpath[strlen(dirpath) - 1] == '/')
+        dirpath[strlen(dirpath) - 1] = '\0';
     if ((dir = opendir(dirpath)) == NULL)
     {
         perror("opendir");
@@ -46,7 +48,7 @@ int calcul(int argc, char *argv[])
         }
         if (S_ISDIR(buf.st_mode) && strcmp(direntry->d_name, ".") == 0)
         {
-            size+=buf.st_size;
+            size += buf.st_size;
         }
         if (S_ISREG(buf.st_mode))
         {
@@ -68,9 +70,9 @@ int calcul(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    long int folderSize=0;
-    folderSize=calcul(argc, argv);
-    printf("Folder size: %ld b (%lf kb / %lf Mb)\n", folderSize, folderSize / 1024.0, folderSize / (1024 * 1024.0));
+    long int folderSize = 0;
+    folderSize = calcul(argc, argv);
+    printf("Marime folder: %ld b (%lf kb / %lf Mb)\n", folderSize, folderSize / 1024.0, folderSize / (1024 * 1024.0));
 }
 
 // // Path: D2dela1.c

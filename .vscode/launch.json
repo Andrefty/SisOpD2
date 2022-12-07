@@ -10,7 +10,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/D2",
-            "args": ["/home/mihnea/Documents/SisOp/D2/.vscode"],
+            "args": ["/home/student/Downloads/MaterialeSO/dirtest"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

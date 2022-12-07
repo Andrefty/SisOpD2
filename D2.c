@@ -1,108 +1,99 @@
-#include <stdlib.h>
+// Program care primeste ca argument in linia de comanda un
+//  director si calculeaza suma dimensiunilor fisierelor din arborescenta cu
+//  originea in el.
+
 #include <stdio.h>
-#include <errno.h>
-#include <stdint.h>
-#include <string.h>
-#include <dirent.h>
+#include <stdlib.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <string.h>
 
-int readFolderSize(int *totalSize, char *folder)
+int calcul(int argc, char *argv[])
 {
-    char fullPath[256];
-    struct dirent *dirData;
-    struct stat buffer;
-    int exists;
-    DIR *poDir;
-    int resp = EXIT_SUCCESS;
+    DIR *dir;
+    struct dirent *direntry;
+    struct stat buf;
+    char *dirpath;
+    int size = 0;
 
-    poDir = opendir(folder);
-
-    if (poDir == NULL)
+    if (argc != 2)
     {
-        perror(folder);
-
-        return EXIT_FAILURE;
+        printf("Usage: %s <directory_path>", argv[0]);
+        exit(1);
     }
 
-    while ((dirData = readdir(poDir)))
+    dirpath = argv[1];
+
+    if ((dir = opendir(dirpath)) == NULL)
     {
-        
-        if (dirData->d_type == DT_DIR)
+        perror("opendir");
+        exit(1);
+    }
+
+    while ((direntry = readdir(dir)) != NULL)
+    {
+        char *filepath = malloc(strlen(dirpath) + strlen(direntry->d_name) + 2);
+        strcpy(filepath, dirpath);
+        strcat(filepath, "/");
+        strcat(filepath, direntry->d_name);
+
+        if (stat(filepath, &buf) < 0)
         {
-            if (dirData->d_name[0] != '.')
-            {
-
-                strcpy(fullPath, folder);
-                strcat(fullPath, "/");
-                strcat(fullPath, dirData->d_name);
-
-
-                if (readFolderSize(totalSize, fullPath) == EXIT_FAILURE)
-                    resp = EXIT_FAILURE;
-            }
+            perror("stat");
+            exit(1);
         }
-        else
+        if (S_ISDIR(buf.st_mode) && strcmp(direntry->d_name, ".") == 0)
         {
-            strcpy(fullPath, folder);
-            strcat(fullPath, "/");
-            strcat(fullPath, dirData->d_name);
-
-            exists = stat(fullPath, &buffer);
-
-            if (exists < 0)
-            {
-                const unsigned int err = errno;
-
-                resp = EXIT_FAILURE;
-
-                continue;
-            }
-            else
-            {
-                (*totalSize) += buffer.st_size;
-
-           
-            }
+            size+=buf.st_size;
+        }
+        if (S_ISREG(buf.st_mode))
+        {
+            size += buf.st_size;
+        }
+        else if (S_ISDIR(buf.st_mode) && strcmp(direntry->d_name, ".") != 0 && strcmp(direntry->d_name, "..") != 0)
+        {
+            size += calcul(2, (char *[]){"", filepath});
         }
     }
 
-    closedir(poDir);
-
-    return resp;
+    if (closedir(dir) < 0)
+    {
+        perror("closedir");
+        exit(1);
+    }
+    return size;
 }
 
 int main(int argc, char *argv[])
 {
-    int folderSize=0;
-    struct stat sb;
-    if (argc != 2)
-    {
-        fprintf(stderr, "Usage: %s <pathname>\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
-
-    // if (lstat(argv[1], &sb) == -1)
-    // {
-    //     perror("lstat");
-    //     exit(EXIT_FAILURE);
-    // }
-
-    // if (general_getFolderSize(argv[1], &folderSize) == EXIT_FAILURE)
-    // {
-    //     printf("Error reading folder size!");
-    // }
-    printf("general_getFolderSize: Start\n");
-
-    //
-    if (readFolderSize(&folderSize, argv[1]) == EXIT_FAILURE)
-    {
-        perror("general_getFolderSize: Call to readFolderSize failed!");
-
-        return EXIT_FAILURE;
-    }
-
-    //
-    printf("general_getFolderSize: Stop\n");
-    printf("Folder size: %d b (%lf kb / %lf Mb)\n", folderSize, folderSize / 1024.0, folderSize / (1024 * 1024.0));
-    return EXIT_SUCCESS;
+    long int folderSize=0;
+    folderSize=calcul(argc, argv);
+    printf("Folder size: %ld b (%lf kb / %lf Mb)\n", folderSize, folderSize / 1024.0, folderSize / (1024 * 1024.0));
 }
+
+// // Path: D2dela1.c
+// // Program care primeste ca argument in linia de comanda un
+// //  director si calculeaza suma dimensiunilor fisierelor din arborescenta cu
+// //  originea in el.
+
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <sys/types.h>
+// #include <sys/stat.h>
+// #include <unistd.h>
+// #include <dirent.h>
+// #include <string.h>
+
+// int main(int argc, char *argv[])
+// {
+//     DIR *dir;
+//     struct dirent *direntry;
+//     struct stat buf;
+//     char *dirpath;
+//     int size = 0;
+
+//     if (argc != 2)
+//     {
+//         printf("Usage: %
